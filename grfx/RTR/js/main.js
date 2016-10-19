@@ -1,35 +1,3 @@
-<?php
-
-$vs = file_get_contents("../shaders/basic.vert");
-$vs = str_replace("\n","",$vs);
-$fs = file_get_contents("../shaders/basic.frag");
-$fs = str_replace("\n","",$fs);
-
-$vs_cube = file_get_contents("../shaders/cubemap.vert");
-$vs_cube = str_replace("\n","",$vs_cube);
-$fs_cube = file_get_contents("../shaders/cubemap.frag");
-$fs_cube = str_replace("\n","",$fs_cube);
-
-$vs_reflect = file_get_contents("../shaders/reflect.vert");
-$vs_reflect = str_replace("\n","",$vs_reflect );
-$fs_reflect = file_get_contents("../shaders/reflect.frag");
-$fs_reflect = str_replace("\n","",$fs_reflect );
-
-
-$cow_obj = file_get_contents("../meshes/SPACECOW.obj");
-$cow_obj = explode("\n",$cow_obj);
-$cow_obj = json_encode($cow_obj);
-
-$cube_obj = file_get_contents("../meshes/cubemap.obj");
-$cube_obj = explode("\n",$cube_obj);
-$cube_obj = json_encode($cube_obj);
-
-$sphere_obj = file_get_contents("../meshes/sphere.obj");
-$sphere_obj = explode("\n",$sphere_obj);
-$sphere_obj = json_encode($sphere_obj);
-
-?>
-
 var gl;
 var sp, sp_cube;
 var canvas;
@@ -48,6 +16,7 @@ var framebuffer;
 var theta = 0;
 //var img = "../textures/ground.png";
 //var basic_tex;
+var cube_obj, sphere_obj;
 
 function getShader(gl, script, type) {
     var shaderScript = script;
@@ -80,8 +49,10 @@ function main() {
 
     // Comments like this fuck up shaders so be careful!
 
-    var fragmentShader = getShader(gl, "<?php echo $fs ?>", "frag");
-    var vertexShader = getShader(gl, "<?php echo $vs ?>", "vert");
+    var vs = load_text_from_file("shaders/basic.vert");
+    var fs = load_text_from_file("shaders/basic.frag");
+    var fragmentShader = getShader(gl, fs, "frag");
+    var vertexShader = getShader(gl, vs, "vert");
     sp = gl.createProgram();
     gl.attachShader(sp, vertexShader);
     gl.attachShader(sp, fragmentShader);
@@ -96,8 +67,10 @@ function main() {
     P_loc = gl.getUniformLocation (sp, "P");
     V_loc = gl.getUniformLocation (sp, "V");
 
-    fragmentShader = getShader(gl, "<?php echo $fs_cube ?>", "frag");
-    vertexShader = getShader(gl, "<?php echo $vs_cube ?>", "vert");
+    var vs_cube = load_text_from_file("shaders/cubemap.vert");
+    var fs_cube = load_text_from_file("shaders/cubemap.frag");
+    fragmentShader = getShader(gl, fs_cube, "frag");
+    vertexShader = getShader(gl, vs_cube, "vert");
     sp_cube = gl.createProgram();
     gl.attachShader(sp_cube, vertexShader);
     gl.attachShader(sp_cube, fragmentShader);
@@ -110,8 +83,10 @@ function main() {
     P_cube_loc = gl.getUniformLocation (sp_cube, "P");
     V_cube_loc = gl.getUniformLocation (sp_cube, "V");
 
-    fragmentShader = getShader(gl, "<?php echo $fs_reflect ?>", "frag");
-    vertexShader = getShader(gl, "<?php echo $vs_reflect ?>", "vert");
+    var vs_reflect = load_text_from_file("shaders/reflect.vert");
+    var fs_reflect = load_text_from_file("shaders/reflect.frag");
+    fragmentShader = getShader(gl, fs_reflect, "frag");
+    vertexShader = getShader(gl, vs_reflect, "vert");
     sp_reflect = gl.createProgram();
     gl.attachShader(sp_reflect, vertexShader);
     gl.attachShader(sp_reflect, fragmentShader);
@@ -162,7 +137,12 @@ function main() {
 
     //basic_tex = create_texture_from_file (img);
 
-    parse_obj_into_vbos ( <?php echo $cube_obj; ?> );
+    cube_obj = load_text_from_file("meshes/cubemap.obj");
+    cube_obj = cube_obj.split("\n");
+    sphere_obj = load_text_from_file("meshes/sphere.obj");
+    sphere_obj = sphere_obj.split("\n");
+
+    parse_obj_into_vbos ( cube_obj );
 
     main_loop();
 }
@@ -174,7 +154,7 @@ function create_dynamic_cubemap(model) {
     P = perspective (90.0, 1.0, 1, 2000.0);
 
     // All scene is cubes
-    parse_obj_into_vbos ( <?php echo $cube_obj; ?> );
+    parse_obj_into_vbos ( cube_obj );
 
     V = mult_mat4_mat4 (scale (identity_mat4(), [-1,-1,1]), model);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, dynamicCubemap, 0);
@@ -262,8 +242,8 @@ function main_loop () {
         // OH GOD DYNAMIC CUBEMAP
         create_dynamic_cubemap (inverse_mat4 (M));
 
-        // all spawns are spheres
-        parse_obj_into_vbos ( <?php echo $sphere_obj; ?> );
+        // all spawns are spheres 
+        parse_obj_into_vbos ( sphere_obj );
 
         gl.viewport(0,0,canvas.clientWidth,canvas.clientHeight);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

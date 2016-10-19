@@ -1,16 +1,3 @@
-<?php
-
-$vs = file_get_contents("../shaders/basic.vert");
-$vs = str_replace("\n","",$vs);
-$fs = file_get_contents("../shaders/basic.frag");
-$fs = str_replace("\n","",$fs);
-
-$cow_obj = file_get_contents("../meshes/SPACECOW.obj");
-$cow_obj = explode("\n",$cow_obj);
-$cow_obj = json_encode($cow_obj);
-
-?>
-
 var gl;
 var sp;
 var canvas;
@@ -19,6 +6,7 @@ var canvas_h;
 var M, V, P;
 var cow_rotation_mat;
 var M_loc, V_loc, P_loc;
+
 
 function getShader(gl, script, type) {
     var shaderScript = script;
@@ -49,8 +37,10 @@ function main() {
     gl.viewportWidth = canvas.clientWidth;
     gl.viewportHeight = canvas.clientHeight;
 
-    var fragmentShader = getShader(gl, "<?php echo $fs ?>", "frag");
-    var vertexShader = getShader(gl, "<?php echo $vs ?>", "vert");
+    var vs = load_text_from_file("shaders/basic.vert");
+    var fs = load_text_from_file("shaders/basic.frag");
+    var fragmentShader = getShader(gl, fs, "frag");
+    var vertexShader = getShader(gl, vs, "vert");
     sp = gl.createProgram();
     gl.attachShader(sp, vertexShader);
     gl.attachShader(sp, fragmentShader);
@@ -104,7 +94,9 @@ function main_loop () {
     V = translate_mat4 (identity_mat4(), [0, 0, -175]);
     P = perspective (45.0, (canvas_w/canvas_h), 0.1, 2000.0);
 
-    parse_obj_into_vbos ( <?php echo $cow_obj; ?> );
+    var cow_obj = load_text_from_file("meshes/SPACECOW.obj");
+    cow_obj = cow_obj.split("\n");
+    parse_obj_into_vbos ( cow_obj );
 
     // it's above origin, so move down before rotation
     // no need to move back up after, camera follows it down
