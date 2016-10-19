@@ -1,3 +1,7 @@
 # Fiquem.github.io
 
-A'ight, the shader loading for my demos is borked, will fix tomorrow
+TODO:
+
+- integrate jekyll to make my life easier
+- stop using all-caps for stuff...
+- /shrug
