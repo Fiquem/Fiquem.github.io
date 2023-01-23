@@ -1,0 +1,3 @@
+[submodule "subs/hanja-learning"]
+	path = subs/hanja-learning
+	url = git@github.com:Fiquem/hanja-learning.git
