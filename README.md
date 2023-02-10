@@ -2,6 +2,6 @@
 
 TODO:
 
-- integrate jekyll to make my life easier
-- stop using all-caps for stuff...
-- /shrug
+- blog?
+- make prettier
+- collapse menu for mobile
