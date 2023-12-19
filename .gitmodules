@@ -1,3 +1,6 @@
 [submodule "subs/hanja-learning"]
 	path = subs/hanja-learning
 	url = git@github.com:Fiquem/hanja-learning.git
+[submodule "subs/collage-maker"]
+	path = subs/collage-maker
+	url = https://github.com/Fiquem/collage-maker.git
